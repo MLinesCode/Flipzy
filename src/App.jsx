@@ -22,7 +22,8 @@ const App = () => {
     maxCards,
     isGameComplete,
     isLoading,
-    hasError
+    hasError,
+    formattedTime
   } = useMemoryGame();
 
   // Load user from localStorage
@@ -101,14 +102,23 @@ const App = () => {
             mistakes={mistakes} 
             matches={matches} 
             total={cards.length / 2} 
+            formattedTime={formattedTime}
           />
           
           {isGameComplete ? (
             <div className="victory-message bg-green-100 border border-green-500 text-green-800 p-4 rounded-lg text-center my-4">
-              <h2 className="text-xl font-bold mb-2">¡Felicidades {user}!</h2>
-              <p>Has completado el juego con {mistakes} errores.</p>
+              <h2 className="victory-message__title text-xl font-bold mb-2">¡Felicidades {user}!</h2>
+              <p className="victory-message__stats mb-2">Has completado el juego con:</p>
+              <div className="victory-message__details flex flex-col items-center justify-center gap-2 mb-4">
+                <p className="victory-message__time p-2 bg-blue-100 rounded-md inline-block">
+                  <span className="font-bold">Tiempo total:</span> {formattedTime}
+                </p>
+                <p className="victory-message__errors p-2 bg-red-100 rounded-md inline-block">
+                  <span className="font-bold">Errores cometidos:</span> {mistakes}
+                </p>
+              </div>
               <button 
-                className="mt-4 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="victory-message__button mt-2 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
                 onClick={resetGame}
               >
                 Jugar de nuevo

@@ -1,7 +1,5 @@
-// src/hooks/useMemoryGame.js
 import { useReducer, useEffect, useCallback, useRef } from 'react';
 import { fetchAnimals } from '../services/api';
-// Note: You might consider using React Query for data fetching instead of this manual approach.
 
 const MOBILE_BREAKPOINT = 768; // Pixel width defining mobile view
 const MATCH_CHECK_DELAY = 800; // Delay (ms) before checking if two flipped cards match
@@ -14,11 +12,13 @@ const initialState = {
   flippedCards: [], // IDs of the two cards currently flipped
   matches: 0, // Number of matched pairs
   mistakes: 0, // Number of mismatches
-  cardCount: 9, // Starting number of cards (adjustable for difficulty)
+  cardCount: 12, // Starting number of cards (adjustable for difficulty)
   gameKey: 0, // Increment to reset the board
   isMobile: false, // True when in mobile view
   isLoading: true, // True while animal data is loading
   hasError: false, // True if there was an error fetching data
+  elapsedTime: 0, // Time elapsed in seconds
+  timerActive: false, // Whether the timer is currently running
 };
 
 const ACTIONS = {
@@ -31,6 +31,10 @@ const ACTIONS = {
   RESET_GAME: 'RESET_GAME',
   SET_LOADING: 'SET_LOADING',
   SET_ERROR: 'SET_ERROR',
+  START_TIMER: 'START_TIMER',
+  STOP_TIMER: 'STOP_TIMER',
+  UPDATE_TIMER: 'UPDATE_TIMER',
+  RESET_TIMER: 'RESET_TIMER',
 };
 
 function gameReducer(state, action) {
@@ -88,6 +92,8 @@ function gameReducer(state, action) {
         matches: 0,
         mistakes: 0,
         flippedCards: [],
+        elapsedTime: 0,
+        timerActive: false,
       };
     }
 
@@ -100,6 +106,9 @@ function gameReducer(state, action) {
         return state;
       }
 
+      // Start timer on first card flip if it's not already running
+      const startTimer = !state.timerActive;
+
       const updatedCards = [
         ...state.cards.slice(0, cardIndex),
         { ...state.cards[cardIndex], status: 'flipped' },
@@ -110,6 +119,7 @@ function gameReducer(state, action) {
         ...state,
         cards: updatedCards,
         flippedCards: [...state.flippedCards, cardId],
+        timerActive: startTimer ? true : state.timerActive,
       };
     }
 
@@ -134,12 +144,16 @@ function gameReducer(state, action) {
           : c
       );
 
+      const newMatches = isMatch ? state.matches + 1 : state.matches;
+      const isGameComplete = newMatches === state.cards.length / 2;
+
       return {
         ...state,
         cards: updatedCards,
-        matches: isMatch ? state.matches + 1 : state.matches,
+        matches: newMatches,
         mistakes: isMatch ? state.mistakes : state.mistakes + 1,
         flippedCards: [],
+        timerActive: isGameComplete ? false : state.timerActive,
       };
     }
 
@@ -151,7 +165,12 @@ function gameReducer(state, action) {
     }
 
     case ACTIONS.RESET_GAME:
-      return { ...state, gameKey: state.gameKey + 1 };
+      return { 
+        ...state, 
+        gameKey: state.gameKey + 1,
+        elapsedTime: 0,
+        timerActive: false
+      };
 
     case ACTIONS.SET_LOADING:
       return { ...state, isLoading: action.payload };
@@ -159,51 +178,35 @@ function gameReducer(state, action) {
     case ACTIONS.SET_ERROR:
       return { ...state, hasError: action.payload, isLoading: false };
 
+    case ACTIONS.START_TIMER:
+      return { ...state, timerActive: true };
+
+    case ACTIONS.STOP_TIMER:
+      return { ...state, timerActive: false };
+
+    case ACTIONS.UPDATE_TIMER:
+      return { ...state, elapsedTime: state.elapsedTime + 1 };
+
+    case ACTIONS.RESET_TIMER:
+      return { ...state, elapsedTime: 0, timerActive: false };
+
     default:
       return state;
   }
 }
 
 /**
- * @typedef {object} MemoryGameCard
- * @property {string} id - Unique card ID (e.g., 'animalId-1').
- * @property {string} animalId - ID of the animal.
- * @property {string} name - Animal's name.
- * @property {string} image - URL to the animal image.
- * @property {'hidden' | 'flipped' | 'matched'} status - Card state.
- */
-
-/**
- * @typedef {object} MemoryGameState
- * @property {Array<MemoryGameCard>} cards - Cards on the board.
- * @property {number} mistakes - Number of mismatches.
- * @property {number} matches - Number of matched pairs.
- * @property {number} cardCount - Current target number of cards.
- * @property {boolean} isMobile - True if mobile layout is active.
- * @property {boolean} isLoading - True while data is loading.
- * @property {boolean} hasError - True if there was an error fetching data.
- * @property {number} maxCards - Maximum cards allowed in current view.
- * @property {boolean} isGameComplete - True when all pairs are matched.
- */
-
-/**
- * @typedef {object} MemoryGameActions
- * @property {Function} flipCard - Call when a card is clicked.
- * @property {Function} increaseCards - Increase the number of cards (difficulty).
- * @property {Function} resetGame - Reset the game board.
- */
-
-/**
  * Custom hook for managing a Memory Match game.
  * It handles data fetching, board setup, card flipping, matching logic,
  * difficulty adjustment, and responsive layout.
  *
- * @returns {MemoryGameState & MemoryGameActions} Game state and actions.
+ * @returns {Object} Game state and actions.
  */
 const useMemoryGame = () => {
   const [state, dispatch] = useReducer(gameReducer, initialState);
   const checkTimeout = useRef(null);
   const strictModeCheck = useRef(false);
+  const timerRef = useRef(null);
 
   // Fetch animal data on mount (avoid duplicate fetches in StrictMode)
   useEffect(() => {
@@ -256,6 +259,25 @@ const useMemoryGame = () => {
     };
   }, [state.flippedCards]);
 
+  // Timer effect - updates the timer every second when active
+  useEffect(() => {
+    if (state.timerActive) {
+      timerRef.current = setInterval(() => {
+        dispatch({ type: ACTIONS.UPDATE_TIMER });
+      }, 1000);
+    } else if (timerRef.current !== null) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+
+    return () => {
+      if (timerRef.current !== null) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, [state.timerActive]);
+
   const flipCard = useCallback(
     (cardId) => {
       if (state.flippedCards.length === 2) return;
@@ -271,6 +293,13 @@ const useMemoryGame = () => {
   const isGameComplete = state.matches > 0 && state.matches === state.cards.length / 2;
   const maxCards = state.isMobile ? MOBILE_MAX_CARDS : DESKTOP_MAX_CARDS;
 
+  // Format elapsed time as mm:ss
+  const formattedTime = useCallback(() => {
+    const minutes = Math.floor(state.elapsedTime / 60);
+    const seconds = state.elapsedTime % 60;
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  }, [state.elapsedTime]);
+
   return {
     cards: state.cards,
     mistakes: state.mistakes,
@@ -281,6 +310,8 @@ const useMemoryGame = () => {
     hasError: state.hasError,
     maxCards,
     isGameComplete,
+    elapsedTime: state.elapsedTime,
+    formattedTime: formattedTime(),
     flipCard,
     increaseCards,
     resetGame,
