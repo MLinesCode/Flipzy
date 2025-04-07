@@ -79,27 +79,73 @@ const App = () => {
 
   return (
     <div className="app container mx-auto p-4">
-      <header className="app__header mb-4 text-center">
-        <h1 className="app__title text-3xl font-bold">Flipzy</h1>
-        <p className="text-gray-500">Classic memory game</p>
-        
-        {user && (
-          <div className="flex flex-col items-center mt-2">
-            <div className="flex items-center gap-2">
-              <p className="text-sm">Player: {user}</p>
-              <button 
-                onClick={() => setShowUpdateModal(true)}
-                className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2 py-1 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300"
-                aria-label="Change name"
-              >
-                <span className="sr-only">Change your name</span>
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-                  <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                </svg>
-              </button>
-            </div>
+      <header className="app__header mb-6 pt-4">
+        <div className="relative overflow-hidden rounded-lg bg-gradient-to-r from-purple-50 to-teal-50 shadow-sm mx-auto max-w-2xl p-4">
+          {/* Decorative elements */}
+          <div className="absolute top-0 right-0 w-24 h-24 -mr-10 -mt-10 rounded-full opacity-10"
+            style={{ background: 'radial-gradient(circle, #8F67FF, #4FD1C5)' }}
+            aria-hidden="true">
           </div>
-        )}
+          <div className="absolute bottom-0 left-0 w-16 h-16 -ml-6 -mb-6 rounded-full opacity-10"
+            style={{ background: 'radial-gradient(circle, #4FD1C5, #8F67FF)' }}
+            aria-hidden="true">
+          </div>
+          
+          {/* Logo and title section */}
+          <div className="text-center relative">
+            <h1 className="app__title text-4xl font-bold mb-1 relative inline-block">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-teal-500"
+                    style={{ 
+                      backgroundImage: 'linear-gradient(to right, #8F67FF, #4FD1C5)',
+                      textShadow: '0px 1px 2px rgba(0, 0, 0, 0.1)'
+                    }}>
+                Flipzy
+              </span>
+              <span className="absolute -top-2 -right-4 text-xs bg-purple-100 text-purple-800 px-1.5 py-0.5 rounded-full font-normal"
+                    style={{ backgroundColor: 'rgba(143, 103, 255, 0.15)', color: '#8F67FF' }}
+                    aria-hidden="true">
+                ✨
+              </span>
+            </h1>
+            <p className="text-slate-600 text-sm mb-4">
+              Classic memory game with a modern twist
+            </p>
+          </div>
+          
+          {/* Player info section */}
+          {user && (
+            <div className="flex flex-col items-center mt-3">
+              <div 
+                className="player-card w-full max-w-xs bg-white rounded-lg shadow-sm p-3 flex items-center justify-between gap-3"
+                style={{ borderLeft: '3px solid #4FD1C5' }}
+              >
+                <div className="flex items-center gap-2">
+                  <div 
+                    className="player-avatar w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium"
+                    style={{ backgroundColor: '#8F67FF' }}
+                    aria-hidden="true"
+                  >
+                    {user.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="player-info">
+                    <div className="text-xs text-slate-500 font-medium">PLAYER</div>
+                    <div className="text-slate-800 font-medium truncate max-w-[140px]">{user}</div>
+                  </div>
+                </div>
+                
+                <button 
+                  onClick={() => setShowUpdateModal(true)}
+                  className="player-edit-btn bg-gray-100 hover:bg-gray-200 text-slate-600 p-2 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-purple-500 cursor-pointer"
+                  aria-label="Edit your player name"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </header>
 
       {/* Show UserModal if no user OR if updating username */}
