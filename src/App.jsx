@@ -32,6 +32,9 @@ const App = () => {
     highScores
   } = useMemoryGame();
 
+  // Detect if the user is on a mobile device
+  const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+
   // Load user from localStorage
   useEffect(() => {
     const storedUser = localStorage.getItem('username');
@@ -169,6 +172,7 @@ const App = () => {
               maxCards={maxCards}
               isLoading={isLoading}
               hasError={hasError}
+              isMobile={isMobile}
             />
           )}
         </>

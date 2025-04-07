@@ -8,22 +8,28 @@ const Board = ({
   cardCount, 
   maxCards, 
   isLoading,
-  hasError 
+  hasError,
+  isMobile
 }) => {
+
+  const hideIncreaseButton = isMobile && cardCount >= maxCards;
+
   return (
     <section className="board-container flex flex-col items-center">
-      {/* Controles */}
+      {/* Controls */}
       <div className="board-controls flex justify-between w-full max-w-sm mb-4">
-        <button
-          onClick={increaseCards}
-          className="bg-green-500 text-white p-2 rounded hover:bg-green-600 disabled:bg-gray-400"
-          disabled={cardCount >= maxCards || isLoading}
-        >
-          Increase Cards
-        </button>
+        {!hideIncreaseButton && (
+          <button
+            onClick={increaseCards}
+            className="board-controls__button--increase bg-green-500 text-white p-2 rounded hover:bg-green-600 disabled:bg-gray-400"
+            disabled={cardCount >= maxCards || isLoading}
+          >
+            Increase Cards
+          </button>
+        )}
         <button
           onClick={resetGame}
-          className="bg-red-500 text-white p-2 rounded hover:bg-red-600 disabled:bg-gray-400"
+          className={`board-controls__button--reset bg-red-500 text-white p-2 rounded hover:bg-red-600 disabled:bg-gray-400 ${hideIncreaseButton ? 'w-full' : ''}`}
           disabled={isLoading}
         >
           Reset Game
