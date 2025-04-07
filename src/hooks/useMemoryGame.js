@@ -1,5 +1,7 @@
-import { useReducer, useEffect, useCallback, useRef } from 'react';
+// src/hooks/useMemoryGame.js
+import { useReducer, useEffect, useCallback, useRef, useMemo } from 'react';
 import { fetchAnimals } from '../services/api';
+import { calculateScore, getHighScores } from '../utils/scoreUtils';
 
 const MOBILE_BREAKPOINT = 768; // Pixel width defining mobile view
 const MATCH_CHECK_DELAY = 800; // Delay (ms) before checking if two flipped cards match
@@ -300,6 +302,19 @@ const useMemoryGame = () => {
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   }, [state.elapsedTime]);
 
+  // Calculate score when game is complete
+  const score = useMemo(() => {
+    if (isGameComplete) {
+      return calculateScore(state.matches, state.mistakes, state.elapsedTime);
+    }
+    return 0;
+  }, [isGameComplete, state.matches, state.mistakes, state.elapsedTime]);
+
+  // Get high scores from localStorage
+  const highScores = useMemo(() => {
+    return getHighScores();
+  }, [isGameComplete]);
+
   return {
     cards: state.cards,
     mistakes: state.mistakes,
@@ -312,6 +327,8 @@ const useMemoryGame = () => {
     isGameComplete,
     elapsedTime: state.elapsedTime,
     formattedTime: formattedTime(),
+    score,
+    highScores,
     flipCard,
     increaseCards,
     resetGame,

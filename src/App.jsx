@@ -2,13 +2,16 @@ import React, { useState, useEffect } from 'react';
 import UserModal from './components/UserModal';
 import Board from './components/Board';
 import Scoreboard from './components/Scoreboard';
-import Notification from './components/Notification'; 
+import Notification from './components/Notification';
+import HighScores from './components/HighScores';
 import useMemoryGame from './hooks/useMemoryGame';
+import { saveScore } from './utils/scoreUtils';
 
 const App = () => {
   const [user, setUser] = useState('');
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [notification, setNotification] = useState({ show: false, message: '' });
+  const [currentScoreEntry, setCurrentScoreEntry] = useState(null);
   
   // Using the hook which now utilizes an internal reducer
   const {
@@ -23,7 +26,10 @@ const App = () => {
     isGameComplete,
     isLoading,
     hasError,
-    formattedTime
+    formattedTime,
+    elapsedTime,
+    score,
+    highScores
   } = useMemoryGame();
 
   // Load user from localStorage
@@ -33,6 +39,21 @@ const App = () => {
       setUser(storedUser);
     }
   }, []);
+
+  // Save score when game completes
+  useEffect(() => {
+    if (isGameComplete && user && score > 0) {
+      const savedScores = saveScore(user, score, matches, mistakes, elapsedTime, formattedTime);
+      // Find the current score entry in the saved scores
+      const latestEntry = savedScores.find(s => 
+        s.username === user && 
+        s.score === score && 
+        s.matches === matches && 
+        s.mistakes === mistakes
+      );
+      setCurrentScoreEntry(latestEntry);
+    }
+  }, [isGameComplete, user, score, matches, mistakes, elapsedTime, formattedTime]);
 
   // Save user to localStorage
   const handleSetUser = (username) => {
@@ -106,23 +127,37 @@ const App = () => {
           />
           
           {isGameComplete ? (
-            <div className="victory-message bg-green-100 border border-green-500 text-green-800 p-4 rounded-lg text-center my-4">
-              <h2 className="victory-message__title text-xl font-bold mb-2">¡Felicidades {user}!</h2>
-              <p className="victory-message__stats mb-2">Has completado el juego con:</p>
-              <div className="victory-message__details flex flex-col items-center justify-center gap-2 mb-4">
-                <p className="victory-message__time p-2 bg-blue-100 rounded-md inline-block">
-                  <span className="font-bold">Tiempo total:</span> {formattedTime}
-                </p>
-                <p className="victory-message__errors p-2 bg-red-100 rounded-md inline-block">
-                  <span className="font-bold">Errores cometidos:</span> {mistakes}
-                </p>
+            <div className="victory-container flex flex-col gap-4">
+              <div className="victory-message bg-green-100 border border-green-500 text-green-800 p-4 rounded-lg text-center">
+                <h2 className="victory-message__title text-xl font-bold mb-2">¡Felicidades {user}!</h2>
+                <p className="victory-message__stats mb-2">Has completado el juego con:</p>
+                <div className="victory-message__details flex flex-col sm:flex-row items-center justify-center gap-2 mb-4">
+                  <p className="victory-message__time p-2 bg-blue-100 rounded-md">
+                    <span className="font-bold">Tiempo total:</span> {formattedTime}
+                  </p>
+                  <p className="victory-message__errors p-2 bg-red-100 rounded-md">
+                    <span className="font-bold">Errores cometidos:</span> {mistakes}
+                  </p>
+                </div>
+                
+                <div className="victory-message__score bg-purple-100 p-3 rounded-lg inline-block">
+                  <span className="victory-message__score-label font-bold text-purple-800">Tu puntaje:</span>{' '}
+                  <span className="victory-message__score-value text-xl text-purple-900">{score}</span>
+                </div>
+                
+                <button 
+                  className="victory-message__button block mx-auto mt-4 bg-green-600 hover:bg-green-700 text-white py-2 px-6 rounded-full focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors"
+                  onClick={resetGame}
+                >
+                  Jugar de nuevo
+                </button>
               </div>
-              <button 
-                className="victory-message__button mt-2 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
-                onClick={resetGame}
-              >
-                Jugar de nuevo
-              </button>
+              
+              {/* Highscores Component */}
+              <HighScores 
+                scores={highScores} 
+                currentScore={currentScoreEntry}
+              />
             </div>
           ) : (
             <Board 
