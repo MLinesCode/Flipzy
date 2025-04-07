@@ -1,5 +1,3 @@
-import React from 'react';
-
 const Scoreboard = ({ mistakes, matches, total, formattedTime }) => {
   // Calculate the progress percentage
   const progress = total > 0 ? (matches / total) * 100 : 0;
