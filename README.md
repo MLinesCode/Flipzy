@@ -2,6 +2,7 @@
 
 <div align="center">
   <br>
+  <img src="https://res.cloudinary.com/mlinescode/image/upload/v1744012251/flipzy-logo_qezmbm.png" />
   <h3>A classic memory game built with React and Vite</h3>
 </div>
 
