@@ -13,9 +13,9 @@ const Scoreboard = ({ mistakes, matches, total, formattedTime }) => {
     >
       <div className="scoreboard__content p-5">
         {/* Stats grid */}
-        <div className="scoreboard__stats-grid grid grid-cols-3 gap-2 mb-5">
+        <div className="scoreboard__stats-grid grid grid-cols-3 gap-4 mb-5">
           {/* Timer Stat */}
-          <div className="scoreboard__stat flex flex-col items-center justify-center p-3 rounded-lg bg-white shadow-sm">
+          <div className="scoreboard__stat flex flex-col items-center justify-center p-4 rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow duration-300">
             <span 
               className="scoreboard__stat-label text-xs font-semibold uppercase tracking-wider mb-1"
               style={{ color: '#718096' }}
@@ -47,7 +47,7 @@ const Scoreboard = ({ mistakes, matches, total, formattedTime }) => {
           </div>
           
           {/* Errors Stat */}
-          <div className="scoreboard__stat flex flex-col items-center justify-center p-3 rounded-lg bg-white shadow-sm">
+          <div className="scoreboard__stat flex flex-col items-center justify-center p-4 rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow duration-300">
             <span 
               className="scoreboard__stat-label text-xs font-semibold uppercase tracking-wider mb-1"
               style={{ color: '#718096' }}
@@ -67,7 +67,7 @@ const Scoreboard = ({ mistakes, matches, total, formattedTime }) => {
           </div>
           
           {/* Matches Stat */}
-          <div className="scoreboard__stat flex flex-col items-center justify-center p-3 rounded-lg bg-white shadow-sm">
+          <div className="scoreboard__stat flex flex-col items-center justify-center p-4 rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow duration-300">
             <span 
               className="scoreboard__stat-label text-xs font-semibold uppercase tracking-wider mb-1"
               style={{ color: '#718096' }}
@@ -110,8 +110,7 @@ const Scoreboard = ({ mistakes, matches, total, formattedTime }) => {
           </div>
           
           <div 
-            className="scoreboard__progress-track w-full h-2 rounded-full overflow-hidden"
-            style={{ backgroundColor: '#E2E8F0' }}
+            className="scoreboard__progress-track w-full h-3 rounded-full overflow-hidden bg-gray-100"
             role="progressbar"
             aria-valuemin="0"
             aria-valuemax="100"
@@ -122,12 +121,25 @@ const Scoreboard = ({ mistakes, matches, total, formattedTime }) => {
               className="scoreboard__progress-bar h-full rounded-full transition-all duration-500 ease-out"
               style={{ 
                 width: `${progress}%`,
-                backgroundColor: progress < 30 ? '#8F67FF' : 
-                                progress < 70 ? '#4FD1C5' : 
-                                '#38A169',
+                background: 
+                  progress < 30 
+                    ? 'linear-gradient(90deg, #8F67FF, #7C4DFF)' 
+                    : progress < 70 
+                      ? 'linear-gradient(90deg, #4FD1C5, #38B2AC)' 
+                      : 'linear-gradient(90deg, #38A169, #2F855A)',
                 boxShadow: progress > 0 ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
               }}
-            ></div>
+            >
+              {/* Progress animation effect */}
+              <div 
+                className="h-full w-full" 
+                style={{
+                  background: 'linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%)',
+                  backgroundSize: '200% 100%',
+                  animation: progress > 0 ? 'shimmer 2s infinite' : 'none'
+                }}
+              ></div>
+            </div>
           </div>
         </div>
       </div>
@@ -143,6 +155,18 @@ const Scoreboard = ({ mistakes, matches, total, formattedTime }) => {
         style={{ background: 'radial-gradient(circle, #4FD1C5 0%, transparent 70%)' }}
         aria-hidden="true"
       ></div>
+      
+      {/* CSS Animation for progress bar */}
+      <style jsx>{`
+        @keyframes shimmer {
+          0% {
+            background-position: -200% 0;
+          }
+          100% {
+            background-position: 200% 0;
+          }
+        }
+      `}</style>
     </section>
   );
 };
