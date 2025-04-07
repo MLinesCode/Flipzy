@@ -1,6 +1,3 @@
-// src/components/HighScores.jsx
-import React from 'react';
-
 const HighScores = ({ scores, currentScore }) => {
   return (
     <div className="high-scores bg-white rounded-lg shadow-md p-4 mt-4">
