@@ -1,5 +1,24 @@
 import Card from './Card';
 
+/**
+ * Board component that renders the memory-card grid together with game controls.
+ *
+ * Displays a loading spinner while cards are being fetched, an error message
+ * with a retry button when the fetch fails, or the card grid once data is ready.
+ * The "Add Cards" button is hidden on mobile when the card limit has been reached.
+ *
+ * @param {Object}     props              - Component props.
+ * @param {Array}      props.cards        - Array of card objects to render.
+ * @param {Function}   props.flipCard     - Callback to flip a card by id.
+ * @param {Function}   props.increaseCards - Callback to add two more cards to the board.
+ * @param {Function}   props.resetGame    - Callback to reset and restart the game.
+ * @param {number}     props.cardCount    - Current number of cards in the game.
+ * @param {number}     props.maxCards     - Maximum allowed cards for the current viewport.
+ * @param {boolean}    props.isLoading    - Whether animal data is still being fetched.
+ * @param {boolean}    props.hasError     - Whether the data fetch encountered an error.
+ * @param {boolean}    props.isMobile     - Whether the viewport is considered mobile.
+ * @returns {JSX.Element}
+ */
 const Board = ({ 
   cards, 
   flipCard, 

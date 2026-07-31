@@ -1,3 +1,19 @@
+/**
+ * VictoryMessage component displayed when the player completes the game.
+ *
+ * Shows a celebration screen with the player's name, final time, match count,
+ * mistake count, and calculated score. Provides a "Play again" button to reset
+ * the game.
+ *
+ * @param {Object}   props               - Component props.
+ * @param {string}   props.username      - Name of the player who completed the game.
+ * @param {string}   props.formattedTime - Total elapsed time formatted as "MM:SS".
+ * @param {number}   props.mistakes      - Total number of mismatches made.
+ * @param {number}   props.matches       - Total number of pairs matched.
+ * @param {number}   props.score         - Final calculated score.
+ * @param {Function} props.resetGame     - Callback to reset and start a new game.
+ * @returns {JSX.Element}
+ */
 const VictoryMessage = ({ username, formattedTime, mistakes, matches, score, resetGame }) => {
   return (
     <div className="victory-message relative overflow-hidden bg-gradient-to-br from-teal-50 to-purple-50 border-2 border-teal-200 p-6 rounded-2xl text-center shadow-lg lg:max-w-4xl lg:mx-auto"

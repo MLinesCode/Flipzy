@@ -1,3 +1,16 @@
+/**
+ * Scoreboard component that shows live game statistics during play.
+ *
+ * Displays the elapsed time (MM:SS), the number of errors made, the number of
+ * matched pairs, and a progress bar that fills as more pairs are found.
+ *
+ * @param {Object} props                - Component props.
+ * @param {number} props.mistakes       - Total number of mismatches so far.
+ * @param {number} props.matches        - Total number of successful matches so far.
+ * @param {number} props.total          - Total number of pairs in the current game.
+ * @param {string} props.formattedTime  - Elapsed time formatted as "MM:SS".
+ * @returns {JSX.Element}
+ */
 const Scoreboard = ({ mistakes, matches, total, formattedTime }) => {
   // Calculate the progress percentage
   const progress = total > 0 ? (matches / total) * 100 : 0;
