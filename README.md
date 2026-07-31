@@ -40,7 +40,7 @@ Flipzy is a classic memory card game built with React where players need to find
 | **React Hooks & Reducers** | For state management |
 | **ES6+** | Modern JavaScript features |
 | **Fetch API** | For data retrieval |
-| **LocalStorage** | For user persistence |
+| **LocalStorage** | For user persistence and high scores |
 | **Vitest** | For unit testing |
 | **Testing Library** | For component testing |
 | **ESLint** | For code linting |
@@ -54,26 +54,26 @@ Flipzy is a classic memory card game built with React where players need to find
 src/
 ├── assets/           # Static assets and images
 ├── components/       # React UI components
-│   ├── Board.jsx     # Game board component
-│   ├── Card.jsx      # Individual card component
-│   ├── HighScores.jsx # High scores display component
-│   ├── Notification.jsx # Notification display component
-│   ├── Scoreboard.jsx # Score tracking component
-│   ├── UserModal.jsx # User login component
-│   └── VictoryMessage.jsx # End game celebration component
+│   ├── Board.jsx     # Game board with card grid and controls
+│   ├── Card.jsx      # Individual flippable card component
+│   ├── HighScores.jsx # Top 3 high scores display
+│   ├── Notification.jsx # Transient notification banner
+│   ├── Scoreboard.jsx # Live game stats (time, matches, errors)
+│   ├── UserModal.jsx # Username entry / update modal
+│   └── VictoryMessage.jsx # End-game celebration screen
 ├── hooks/
-│   └── useMemoryGame.js # Custom hook with game reducer and logic
+│   └── useMemoryGame.js # Custom hook: game state via useReducer
 ├── services/
-│   └── api.js        # API interaction and data fetching
+│   └── api.js        # Animal data fetching with in-session cache
 ├── styles/           # Additional CSS styles
-│   └── card.css      # Card-specific styles
+│   └── card.css      # Card flip animation styles
 ├── utils/
-│   └── scoreUtils.js # Score calculation and persistence utilities
+│   └── scoreUtils.js # Score calculation and localStorage helpers
 ├── __tests__/        # Test files
-│   └── utils/        # Utility tests
+│   └── utils/        # Unit tests for utility functions
 ├── test/             # Test setup and configuration
-├── App.jsx           # Main application component
-└── main.jsx         # Application entry point
+├── App.jsx           # Root component – wires all pieces together
+└── main.jsx          # Application entry point
 ```
 
 ## 🚀 Installation and Setup
@@ -82,36 +82,47 @@ To run this project locally, follow these steps:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/flipzy.git
-   cd flipzy
+   git clone https://github.com/MLinesCode/Flipzy.git
+   cd Flipzy
    ```
 
 2. Install dependencies:
-  ```bash
-  npm install
-  ```
+   ```bash
+   npm install
+   ```
 
 3. Start the development server:
-  ```bash
-  npm run dev
-  ```
+   ```bash
+   npm run dev
+   ```
 
 4. Build for production:
-  ```bash
-  npm run build
-  ```
+   ```bash
+   npm run build
+   ```
 
-5. Run test
-  ```bash
-  npm test
-  ```
+5. Preview the production build:
+   ```bash
+   npm run preview
+   ```
 
-6. Test coverage
-  ```bash
-  npm run test:coverage
-  ```
+6. Run tests:
+   ```bash
+   npm test
+   ```
+
+7. Run tests with coverage report:
+   ```bash
+   npm run test:coverage
+   ```
+
+8. Lint the codebase:
+   ```bash
+   npm run lint
+   ```
 
 ## 📖 How to Play
+
 <div align="center">
   <table>
     <tr>
@@ -141,68 +152,99 @@ To run this project locally, follow these steps:
   </table>
 </div>
 
+## 🧩 Component Reference
+
+| Component | Props | Description |
+|-----------|-------|-------------|
+| `Board` | `cards`, `flipCard`, `increaseCards`, `resetGame`, `cardCount`, `maxCards`, `isLoading`, `hasError`, `isMobile` | Renders the card grid, loading/error states and the Add Cards / Reset Game controls |
+| `Card` | `card`, `flipCard` | Renders a single card with a 3-D flip animation; card status can be `hidden`, `flipped`, or `matched` |
+| `Scoreboard` | `mistakes`, `matches`, `total`, `formattedTime` | Displays live game stats and a progress bar |
+| `UserModal` | `setUser`, `currentUser`, `isUpdating`, `onClose` | Modal dialog for entering or updating the player username |
+| `VictoryMessage` | `username`, `formattedTime`, `mistakes`, `matches`, `score`, `resetGame` | End-game celebration screen with final stats |
+| `HighScores` | `scores`, `currentScore` | Displays the top-3 persisted high scores, highlighting the current session's entry |
+| `Notification` | `message`, `type`, `onClose`, `duration` | Auto-dismissing toast notification (`success` / `error` / `info`) |
 
 ## 🏗️ Application Architecture
-State Management
-Flipzy uses a custom hook (useMemoryGame) that implements the reducer pattern for state management. This provides a centralized way to handle all game-related state and logic, including:
 
-* Card flipping
-* Match checking
-* Score tracking
-* Game reset
-* Difficulty adjustment
-* Timer management
+### State Management
+
+Flipzy uses a custom hook (`useMemoryGame`) that implements the reducer pattern for state management. This provides a centralized way to handle all game-related state and logic, including:
+
+- Card flipping
+- Match checking
+- Score tracking
+- Game reset
+- Difficulty adjustment
+- Timer management
+
+### Score Formula
+
+```
+Score = (matches × 100) − (mistakes × 10) − (elapsedTime × 0.5)
+```
+
+The result is rounded to the nearest integer and floored at 0. The top 3 scores are persisted in `localStorage` under the key `flipzy_high_scores`.
 
 ### API Integration
-The application fetches animal data from an external API to generate the memory cards. The API service includes:
 
-* Data fetching with error handling
-* Response caching to minimize network requests
-* Optimized data mapping for the game's needs
+The application fetches animal data from an external API to generate the memory cards. The API service (`src/services/api.js`) includes:
 
-### Responsive Desing
+- Data fetching with error handling
+- In-session response caching to avoid duplicate network requests
+- Optimized data mapping for the game's needs (`id`, `name`, `image`)
+
+### Responsive Design
+
 The game adapts to different screen sizes:
 
-* Mobile view: 3 columns of cards with maximum 12 cards
-* Desktop view: 5 columns of cards with maximum 40 cards
+- **Mobile** (< 768 px): 3-column grid, maximum 12 cards
+- **Desktop** (≥ 768 px): 5-column grid, maximum 40 cards
 
 ### Testing Strategy
+
 The project implements a comprehensive testing approach:
 
-* Unit tests for utility functions
-* Component tests for UI elements
-* Mock implementations for localStorage and API calls
+- Unit tests for utility functions (`scoreUtils.js`)
+- Component tests for UI elements
+- Mock implementations for `localStorage` and API calls
 
-### 🤔 Development Decisions
+## 🤔 Development Decisions
+
 ### Why React with Reducer Pattern?
-I chose to use the reducer pattern with React Hooks to centralize game logic and state management. This provides better separation of concerns and makes the game state transitions more predictable and testable.
+
+The reducer pattern with React Hooks centralizes game logic and state management. This provides better separation of concerns and makes game state transitions more predictable and testable.
 
 ### Why Tailwind CSS?
+
 Tailwind allows for rapid UI development with consistent design. The utility-first approach made it easy to create responsive layouts and consistent card designs while maintaining a cohesive visual language throughout the application.
 
 ### Performance Considerations
 
-⚡ API response caching to minimize network requests
-⚡ Efficient state updates using the reducer pattern
-⚡ Memoization of derived state values
-⚡ Proper cleanup of timers and event listeners
-⚡ PWA configuration for offline capability
+- ⚡ API response caching to minimize network requests
+- ⚡ Efficient state updates using the reducer pattern
+- ⚡ Memoization of derived state values (`useMemo`, `useCallback`)
+- ⚡ Proper cleanup of timers and event listeners
+- ⚡ PWA configuration for offline capability
 
-#### 🔮 Future Improvements
+## 🔮 Future Improvements
+
 ### Short-term Enhancements
 
-* Multiple Themes: Add themes beyond animals (vehicles, places, foods)
-* Sound Effects: Add audio feedback for card flips and matches
-* Timer Modes: Add timed challenges with countdown timers
-* Difficulty Levels: Implement predefined difficulty settings (easy, medium, hard)
-* Game Statistics: Track and display more detailed player statistics
+- **Multiple Themes**: Add themes beyond animals (vehicles, places, foods)
+- **Sound Effects**: Add audio feedback for card flips and matches
+- **Timer Modes**: Add timed challenges with countdown timers
+- **Difficulty Levels**: Implement predefined difficulty settings (easy, medium, hard)
+- **Game Statistics**: Track and display more detailed player statistics
 
 ### Medium-term Features
 
-* Backend Integration: Replace localStorage with a server-backed persistence system
-* User Accounts: Add proper authentication and user profiles
-* Global Leaderboards: Implement global high scores across all players
-* Custom Card Sets: Allow users to create and share custom card sets
-* Animations: Enhance victory celebrations and transitions
-* Add animations for matched pairs
-* Implement a multiplayer mode
+- **Backend Integration**: Replace localStorage with a server-backed persistence system
+- **User Accounts**: Add proper authentication and user profiles
+- **Global Leaderboards**: Implement global high scores across all players
+- **Custom Card Sets**: Allow users to create and share custom card sets
+- **Enhanced Animations**: Improve victory celebrations and card-match transitions
+- **Multiplayer Mode**: Allow two players to compete on the same device
+
+## 🤝 Contributing
+
+Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to get started.

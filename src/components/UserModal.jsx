@@ -1,5 +1,22 @@
 import React, { useState, useEffect, useRef } from 'react';
 
+/**
+ * UserModal component for entering or updating the player's username.
+ *
+ * Renders a focused modal dialog with an animated label, a text input, and a
+ * submit button. When `isUpdating` is `true` (the player already has a name),
+ * a "Cancel" button is also shown and pressing Escape closes the modal.
+ *
+ * The username is validated (non-empty after trimming) before being passed to
+ * `setUser` and persisted in `localStorage`.
+ *
+ * @param {Object}   props                 - Component props.
+ * @param {Function} props.setUser         - Callback receiving the confirmed username string.
+ * @param {string}   [props.currentUser=''] - Existing username pre-filled when updating.
+ * @param {Function} [props.onClose]       - Callback to close the modal (used when updating).
+ * @param {boolean}  [props.isUpdating=false] - When `true`, the modal is in "update" mode.
+ * @returns {JSX.Element}
+ */
 const UserModal = ({ setUser, currentUser = '', onClose, isUpdating = false }) => {
   const [inputValue, setInputValue] = useState('');
   const [isFocused, setIsFocused] = useState(false);

@@ -1,3 +1,22 @@
+/**
+ * HighScores component that renders the top-3 persisted high scores.
+ *
+ * Each row shows the rank (with gold / silver / bronze styling for the top 3),
+ * the player's username, and their score. If the current session's entry is
+ * among the displayed scores, that row is highlighted and marked with a star.
+ *
+ * The score formula is also shown at the bottom:
+ * `Score = (matches × 100) − (mistakes × 10) − (elapsedSeconds × 0.5)`
+ *
+ * @param {Object}        props              - Component props.
+ * @param {Array<Object>} props.scores       - Array of high-score objects to display.
+ * @param {string}        props.scores[].username    - Player username.
+ * @param {number}        props.scores[].score       - Numeric score value.
+ * @param {string}        props.scores[].date        - ISO date string used as a unique key.
+ * @param {Object|null}   props.currentScore - The score entry saved during this session,
+ *                                             or `null` if no score was saved yet.
+ * @returns {JSX.Element}
+ */
 const HighScores = ({ scores, currentScore }) => {
   return (
     <div className="high-scores bg-white rounded-lg shadow-md overflow-hidden">

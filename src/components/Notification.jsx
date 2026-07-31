@@ -1,5 +1,19 @@
 import React, { useEffect } from 'react';
 
+/**
+ * Notification component that shows a transient toast-style banner.
+ *
+ * The notification auto-dismisses after `duration` milliseconds by calling
+ * `onClose`. Three visual variants are supported: `success` (green),
+ * `error` (red), and `info` (blue).
+ *
+ * @param {Object}   props            - Component props.
+ * @param {string}   props.message    - Text content to display inside the notification.
+ * @param {'success'|'error'|'info'} [props.type='success'] - Visual style variant.
+ * @param {Function} props.onClose    - Callback invoked when the notification should be hidden.
+ * @param {number}   [props.duration=3000] - Time in milliseconds before auto-dismissal.
+ * @returns {JSX.Element}
+ */
 const Notification = ({ message, type = 'success', onClose, duration = 3000 }) => {
   useEffect(() => {
     const timer = setTimeout(() => {

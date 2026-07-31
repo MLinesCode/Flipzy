@@ -1,3 +1,22 @@
+/**
+ * Card component representing a single memory card.
+ *
+ * The card supports three visual states:
+ * - `hidden`  – face-down (shows the decorative back face with a "?" symbol)
+ * - `flipped` – face-up during an active comparison (shows the animal image)
+ * - `matched` – permanently face-up after a successful pair match (highlighted in green)
+ *
+ * Clicking or pressing Enter on a hidden card triggers the `flipCard` callback.
+ *
+ * @param {Object}   props           - Component props.
+ * @param {Object}   props.card      - Card data object.
+ * @param {string}   props.card.id   - Unique card identifier.
+ * @param {string}   props.card.name - Animal name displayed below the image.
+ * @param {string}   props.card.image - URL of the animal image.
+ * @param {'hidden'|'flipped'|'matched'} props.card.status - Current visual state.
+ * @param {Function} props.flipCard  - Callback invoked with the card's id when flipped.
+ * @returns {JSX.Element}
+ */
 const Card = ({ card, flipCard }) => {
   const handleClick = () => {
     if (card.status === 'hidden') {
